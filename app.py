@@ -33,7 +33,6 @@ def delete_event():
         event = request.get_json()
         id = event["id"]
         result = delete(db, id)
-        db = load_db()
-        # print(result)
+        #db = load_db()
         return result
 

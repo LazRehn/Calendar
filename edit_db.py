@@ -10,12 +10,10 @@ def save_db(db):
 
 def delete(db, id):
     result = "NOT_OK"
-    with open("db.json", "w") as f:
-        data = db
-        for i in range(len(data)):
-            if data[i]["id"]==str(id):
-                del data[i]
-                save_db(data)
-                result = "OK"
-                break
+    for i in range(len(db)):
+        if db[i]["id"]==str(id):
+            del db[i]
+            save_db(db)
+            result = "OK"
+            break
     return result
