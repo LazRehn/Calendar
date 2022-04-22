@@ -84,6 +84,24 @@
         // console.log("Deleted");
       },
 
+      onEventMoved: async (args) => {
+        const data = {
+          id: args.e.id(),
+          newStart: args.newStart,
+          newEnd: args.newEnd,
+        };
+        await DayPilot.Http.post(`/move_event`, data);
+        console.log("Moved.");
+      },
+      onEventResized: async (args) => {
+        const data = {
+          id: args.e.id(),
+          newStart: args.newStart,
+          newEnd: args.newEnd,
+        };
+        await DayPilot.Http.post(`/move_event`, data);
+        console.log("Resized.");
+      },
       
       onTimeRangeSelected: async (args) => {
         const form = [
@@ -116,6 +134,32 @@
         // console.log("Created.");
       },
 
+      // Käyttäjä on valinnut tapahtuman muutettavaksi
+      onEventClick: async (args) => {
+        const form = [
+          {name: "Name", id: "text"}
+        ];
+
+        // Näytetään vanhat tiedot
+        const modal = await DayPilot.Modal.form(form, args.e.data);
+        if (modal.canceled) {
+          return;
+        }
+
+        // Otetaan uudet tiedot talteen ja lähetetään ne palvelimelle
+        const data = {
+          id: args.e.id(),
+          text: modal.result.text
+        };
+        await DayPilot.Http.post(`/update_event`, data);
+
+        dp.events.update({
+          ...args.e.data,
+          text: modal.result.text
+        });
+        console.log("Updated.");
+
+      }
 
     });
     dp.init();
