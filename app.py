@@ -36,3 +36,23 @@ def delete_event():
         #db = load_db()
         return result
 
+@app.route("/move_event", methods=["POST"])
+def move_event():
+    result = "NOT_OK"
+    if request.method == "POST":
+        event = request.get_json()
+        id = event["id"]
+        for i in range(len(db)):
+            if db[i]["id"]==str(id):
+                db[i]["start"] = event["newStart"]
+                db[i]["end"] = event["newEnd"]
+                result = save_db(db)
+                result = "OK"
+                print("Changed event")
+                break
+    print("Tried o changed event time, but did not succeed")
+    return result
+
+@app.route("/update_event", methods=["POST"])
+def update_event():
+    print("Event updated / changed")

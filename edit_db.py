@@ -17,3 +17,4 @@ def delete(db, id):
             result = "OK"
             break
     return result
+
