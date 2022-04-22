@@ -51,6 +51,8 @@
 
   <script>
 
+    // Näyttää kuukausikalenterin, jossa mahdollisuus valita viikkokalenteri
+    
     const nav = new DayPilot.Navigator("nav", {
       showMonths: 1,
       skipMonths: 1,
@@ -68,6 +70,7 @@
     // Luodaan kalenteri
     const dp = new DayPilot.Calendar("dp", {
       viewType: "WorkWeek",
+      headerDateFormat: "dddd dd.mm.yyyy",
       businessBeginsHour: 8,
       // dayBeginsHour: 8,
       // dayEndsHour: 19,
@@ -77,7 +80,7 @@
 
       // Varauksen muotoilu
       onBeforeEventRender: args => {
-          args.data.html = "<strong>Reg nro:</strong> " + args.data.reg_nro+"  <strong>Merkki:</strong> "+args.data.merkki+"<br>"+"<strong>Asiakas:</strong> "+args.data.asiakas+"<br>"+ args.data.puh_nro+"<br>"+"<strong>Työmääräys / selite:</strong> <br>"+args.data.tyomaarays;
+          args.data.html = "<strong>Reg nro:</strong> "+args.data.reg_nro+" <strong>Merkki:</strong> "+args.data.merkki+"<br>"+"<strong>Asiakas:</strong> "+args.data.asiakas+"<br>"+ args.data.puh_nro+"<br>"+"<strong>Työmääräys / selite:</strong> <br>"+args.data.tyomaarays;
         },
       
       // Poistaa tapahtuman
@@ -113,7 +116,7 @@
         const event = {
           start: args.start,
           end: args.end,
-          id: DayPilot.guid(), //
+          id: DayPilot.guid(),
           reg_nro: modal.result.reg_nro,
           merkki: modal.result.merkki,
           asiakas: modal.result.asiakas,
