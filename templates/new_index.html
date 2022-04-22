@@ -69,11 +69,16 @@
     const dp = new DayPilot.Calendar("dp", {
       viewType: "WorkWeek",
       businessBeginsHour: 8,
-      dayBeginsHour: 8,
-      dayEndsHour: 19,
+      // dayBeginsHour: 8,
+      // dayEndsHour: 19,
       locale: "fi-fi",
 
       eventDeleteHandling: "Update",
+
+      // Varauksen muotoilu
+      onBeforeEventRender: args => {
+          args.data.html = "<strong>Reg nro:</strong> " + args.data.reg_nro+"  <strong>Merkki:</strong> "+args.data.merkki+"<br>"+"<strong>Asiakas:</strong> "+args.data.asiakas+"<br>"+ args.data.puh_nro+"<br>"+"<strong>Työmääräys / selite:</strong> <br>"+args.data.tyomaarays;
+        },
       
       // Poistaa tapahtuman
       onEventDeleted: async (args) => {
@@ -84,10 +89,18 @@
         // console.log("Deleted");
       },
 
-      
+
+
+      // Ajanvarauksen lisääminen
+
+      //Luodaan popup lomake
       onTimeRangeSelected: async (args) => {
         const form = [
-          {name: "Name", id: "text"}
+          {name: "Reg. nro", id: "reg_nro"},
+          {name: "Merkki ja malli", id: "merkki"},
+          {name: "Asiakas", id: "asiakas"},
+          {name: "Puh. nro", id: "puh_nro"},
+          {name: "Työmääräys / selite", id: "tyomaarays"}
         ];
 
         const modal = await DayPilot.Modal.form(form, {});
@@ -101,19 +114,30 @@
           start: args.start,
           end: args.end,
           id: DayPilot.guid(), //
-          text: modal.result.text
+          reg_nro: modal.result.reg_nro,
+          merkki: modal.result.merkki,
+          asiakas: modal.result.asiakas,
+          puh_nro: modal.result.puh_nro,
+          tyomaarays: modal.result.tyomaarays
         };
-        const {data} = await DayPilot.Http.post('/add_event', event);
+        const {data} = await DayPilot.Http.post('/add_event', event); // Lähettää varaustiedot palvelimelle
 
+        
+        
         // Lisää kalenteriin
         dp.events.add({
           start: args.start,
           end: args.end,
           id: data.id,
-          text: modal.result.text
+          reg_nro: data.reg_nro,
+          merkki: data.merkki,
+          asiakas: data.asiakas,
+          puh_nro: data.puh_nro,
+          tyomaarays: data.tyomaarays
         });
-        // console.log("result", data)
         // console.log("Created.");
+
+        
       },
 
 
