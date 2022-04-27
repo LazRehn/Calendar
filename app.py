@@ -5,11 +5,9 @@ app = Flask(__name__)
 
 db = load_db()
 
-
 @app.route("/")
 def welcome():
     return render_template("new_index.html")
-
 
 # funktio lähettää sivulle dataa db.jason tietostosta
 @app.route("/eventlist")
@@ -48,11 +46,22 @@ def move_event():
                 db[i]["end"] = event["newEnd"]
                 result = save_db(db)
                 result = "OK"
-                print("Changed event")
                 break
-    print("Tried o changed event time, but did not succeed")
     return result
 
 @app.route("/update_event", methods=["POST"])
 def update_event():
-    print("Event updated / changed")
+    result = "NOT_OK"
+    #result1 = {}
+    if request.method == "POST":
+        event = request.get_json()
+        for i in range(len(db)):
+            if event["id"] == db[i]["id"]:
+                db[i]["reg_nro"] = event["reg_nro"]
+                db[i]["merkki"] = event["merkki"]
+                db[i]["asiakas"] = event["asiakas"]
+                db[i]["puh_nro"] = event["puh_nro"]
+                db[i]["tyomaarays"] = event["tyomaarays"]
+                result = "OK"
+                save_db(db)
+                return event
