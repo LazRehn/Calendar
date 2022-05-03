@@ -1,20 +1,25 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="fi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timetable Flask</title>
   
   <style type="text/css">
     p, body, td, input, select { font-family: -apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; font-size: 14px; }
-    body { padding: 0px; margin: 0px; background-color: #ffffff; }
-    a { color: #1155a3; }
-    .space { margin: 10px 0px 10px 0px; }
-    .header { background: #003267; background: linear-gradient(to right, #011329 0%, #00639e 44%, #011329 100%); padding: 20px 10px; color: white; box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.75); }
-    .header a { color: white; }
-    .header h1 a { text-decoration: none; }
-    .header h1 { padding: 0px; margin: 0px; }
-    .main { padding: 10px; margin-top: 10px; }
+    body { padding: 0px; margin: 0px; background-color: #bedbf3; }
+    .header { margin-bottom: 20px; background: linear-gradient(to right, #011329 0%, #00639e 44%, #011329 100%); padding: 20px 10px; color: white; box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.75); }
+    .header h1 { display: inline; padding: 0px; margin: 0px; }
+    .header h2 { display: inline; float: right; padding: 0px; margin: 0px;}
+    .main { padding: 10px; margin-top: 5px; }
+    #booking {
+      width: 212px;
+      height: 50px;
+      padding: 0px;
+      font-size: 15px;
+      color: #333333;
+    }
+
     </style>
 
   <script type="text/javascript" src="{{url_for('static', filename='js/daypilot-all.min.js')}}"></script>
@@ -23,27 +28,23 @@
 </head>
 <body>
   <div class="main">
+    
+    <div class="header">
+      <h1>Yrityksen nimi</h1>
+      <h2>Program name</h2>
+    </div>
+
     <div style="display: flex">
+
   
       <div style="margin-right: 10px;">
-        <div id="nav"></div>
-      </div>
-  
-      <div style="flex-grow: 1;">
-  
-        <div class="space">
-          Theme: <select id="theme">
-          <option value="calendar_default">Default</option>
-          <option value="calendar_white">White</option>
-          <option value="calendar_g">Google-Like</option>
-          <option value="calendar_green">Green</option>
-          <option value="calendar_traditional">Traditional</option>
-          <option value="calendar_transparent">Transparent</option>
-        </select>
+        <div>
+          <button type="button", id="booking">Ajanvaraus</button>
         </div>
-  
-        <div id="dp"></div>
+        <div id="nav", style="bottom: -340px"></div>
       </div>
+
+      <div id="dp"></div>
   
     </div>
   </div>
@@ -62,7 +63,7 @@
         dp.update({
           startDate: args.day
         });
-        app.loadEvents();
+        dp.loadEvents();
       }
     });
     nav.init();
@@ -78,17 +79,17 @@
       headerDateFormat: "dddd dd.MM.yyyy",
       eventDeleteHandling: "Update",
 
-      onBeforeHeaderRender: args => {
-        args.header.html = args.header.toString("dddd"+"<br>"+"dd.MM.yyyy");
-      },
+      // onBeforeHeaderRender: args => {
+      //   args.header.html = args.header.toString("dddd"+"<br>"+"dd.MM.yyyy");
+      // },
 
       // Varauksen muotoilu
       onBeforeEventRender: args => {
-          args.data.html = "<strong>Reg nro:</strong> "
-          +args.data.reg_nro+" <strong>Merkki:</strong> "
-          +args.data.merkki+"<br>"+"<strong>Asiakas:</strong> "
+          args.data.html = "<b>Reg nro:</b> "
+          +args.data.reg_nro+" <b>Merkki:</b> "
+          +args.data.merkki+"<br>"+"<b>Asiakas:</b> "
           +args.data.asiakas+"<br>"+ args.data.puh_nro+"<br>"
-          +"<strong>Työmääräys / selite:</strong> <br>"
+          +"<b>Työmääräys / selite:</b> <br>"
           +args.data.tyomaarays;
         },
       
@@ -205,30 +206,15 @@
           tyomaarays: data.tyomaarays
         });
 
+      },
+
+      loadEvents() {
+        dp.events.load('/eventlist');
       }
 
     });
     dp.init();
-
-    const app = {
-      elements: {
-        theme: document.querySelector("#theme")
-      },
-      loadEvents() {
-        dp.events.load('/eventlist');
-      },
-      init() {
-        app.elements.theme.addEventListener("change", () => {
-          dp.update({
-            theme: app.elements.theme.value
-          });
-        });
-
-        app.loadEvents();
-      }
-    };
-    app.init();
-
+    dp.loadEvents();
 
   </script>
 </body>
