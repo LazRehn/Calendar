@@ -3,7 +3,7 @@ from flask import Flask, render_template, jsonify, request, url_for,redirect
 from SQL_calls import load_db, append_db, move_db, update_db, delete_db
 
 app = Flask(__name__)
-app.run(use_reloader=False)
+# app.run(use_reloader=False) ? was giving error
 
 db = load_db()
 
