@@ -1,6 +1,6 @@
 
 
-// Change calendar view, between day and week view, when button is pressed in browser
+// Change calendar view, between day and week, when button is pressed in browser
 function change_view() {
   const view = document.getElementById("change_view").innerHTML;
   if (view == "Päivänäkymä") {
