@@ -1,10 +1,12 @@
 from flask import Flask, render_template, jsonify, request, url_for,redirect
-#from edit_db import load_db, save_db, delete
+#from  edit_db import load_db, append_db, move_db, update_db, delete_db
 from SQL_calls import load_db, append_db, move_db, update_db, delete_db
 
 app = Flask(__name__)
-# app.run(use_reloader=False) ? was giving error
+if __name__ == "__main__":
+    app.run(use_reloader=False)
 
+global db
 db = load_db()
 
 @app.route("/")
@@ -25,7 +27,6 @@ def add_event():
     if request.method == "POST":
         event = request.get_json()
         db.append(event)
-        #save_db(db) # only with json
         append_db(event)
         return event
 
@@ -40,7 +41,6 @@ def move_event():
             if db[i]["id"]==str(id):
                 db[i]["start"] = event["newStart"]
                 db[i]["end"] = event["newEnd"]
-                #result = save_db(db) # only with json
                 result = move_db(event)
                 break
     return result
@@ -58,9 +58,12 @@ def update_event():
                 db[i]["asiakas"] = event["asiakas"]
                 db[i]["puh_nro"] = event["puh_nro"]
                 db[i]["tyomaarays"] = event["tyomaarays"]
-                #save_db(db) # only with json
                 result = update_db(event)
-                return event #should it return something else, if update fails?
+                break
+    if result == "OK":
+        return event
+    else:
+        return {}
 
 # Poistaa tapahtuman db.json:sta. Key = id
 @app.route("/delete_event", methods=["POST"])
@@ -73,7 +76,6 @@ def delete_event():
         for i in range(len(db)):
             if db[i]["id"]==event_id:
                 del db[i]
-                #save_db(db) only with json
                 result = delete_db(event_id)
                 break
     return result

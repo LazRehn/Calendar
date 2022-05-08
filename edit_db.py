@@ -1,20 +1,30 @@
 import json
 
+global db
+
 def load_db():
+    global db
     with open("db.json") as f:
-        return json.load(f)
+        db = json.load(f)
+    return db
 
-def save_db(db):
+def save_db():
+    global db
     with open("db.json", "w") as f:
-        return json.dump(db, f)
+        json.dump(db, f)
 
-def delete(db, id):
-    result = "NOT_OK"
-    for i in range(len(db)):
-        if db[i]["id"]==str(id):
-            del db[i]
-            save_db(db)
-            result = "OK"
-            break
-    return result
+def append_db(event):
+    save_db() # just saves with the appended element
+    return "OK"
 
+def move_db(event):
+    save_db() # just saves with the moved element
+    return "OK"
+    
+def update_db(event):
+    save_db() # just saves with the updated element
+    return "OK"
+    
+def delete_db(event):
+    save_db() # just saves without the deleted element
+    return "OK"
