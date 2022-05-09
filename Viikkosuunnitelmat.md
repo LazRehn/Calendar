@@ -21,5 +21,8 @@ Lasse: Koko kentän siirtomahdollisuus.
 Päivitetään projektisuunitelmaa.
 
 # 27.4. - 3.5.2022
-Varaustiedot tallennetaan Sqlite-tietokantaan.
-Parannellaan kalenterin ulkonäköä.
+Lasse :Varaustiedot tallennetaan Sqlite-tietokantaan. <br/>
+Margus: Parannellaan kalenterin ulkonäköä.
+
+# 4.5. - 9.5.2022
+Jatketaan edellisen viikon tehtävijä.
