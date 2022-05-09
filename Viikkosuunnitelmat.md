@@ -26,3 +26,8 @@ Margus: Parannellaan kalenterin ulkonäköä.
 
 # 4.5. - 9.5.2022
 Jatketaan edellisen viikon tehtävijä.
+
+# 10.5. - 16.5.2022
+
+Luodaan login mahdollisuus. <br/>
+Luodaan mahdollisuus kirjata töiden hinnat laskutukseen.
