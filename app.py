@@ -3,8 +3,8 @@ from flask import Flask, render_template, jsonify, request, url_for,redirect
 from SQL_calls import load_db, append_db, move_db, update_db, delete_db
 
 app = Flask(__name__)
-if __name__ == "__main__":
-    app.run(use_reloader=False)
+# if __name__ == "__main__":
+#     app.run(use_reloader=False)
 
 global db
 db = load_db()
