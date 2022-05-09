@@ -17,8 +17,6 @@ def welcome():
 @app.route("/eventlist")
 def eventlist():
     global db
-    a=2 # vain
-    b=3
     test_json = jsonify(db)
     return test_json
 
