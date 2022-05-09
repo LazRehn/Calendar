@@ -6,16 +6,16 @@ function change_view() {
   if (view == "Päivänäkymä") {
     nav.selectMode = "Day"
     dp.viewType = "Day"
-    nav.update();
-    dp.update();
+    // nav.update();
+    // dp.update();
     document.getElementById("change_view").innerHTML = "Viikkonäkymä";
   } else if (view == "Viikkonäkymä") {
     nav.selectMode = "Week"
     dp.viewType = "WorkWeek"
-    nav.update();
-    dp.update();
     document.getElementById("change_view").innerHTML = "Päivänäkymä"
   };
+  nav.update();
+  dp.update();
 };
 
 // Näyttää kuukausikalenterin, jossa mahdollisuus valita viikkokalenteri
