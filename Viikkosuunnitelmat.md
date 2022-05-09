@@ -29,5 +29,5 @@ Jatketaan edellisen viikon tehtävijä.
 
 # 10.5. - 16.5.2022
 
-Tehdään login mahdollisuus. <br/>
-Aloitetaan sovelluksen testaamista.
+Luodaan login mahdollisuus. <br/>
+Luodaan mahdollisuus kirjata töiden hinnat laskutukseen.
