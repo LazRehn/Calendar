@@ -19,3 +19,7 @@ Lasse: Koko kentän siirtomahdollisuus.
   Koko kentän muokkausmahdollisuus.
 
 Päivitetään projektisuunitelmaa.
+
+# 27.4. - 3.5.2022
+Varaustiedot tallennetaan Sqlite-tietokantaan.
+Parannellaan kalenterin ulkonäköä.
