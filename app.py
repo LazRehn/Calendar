@@ -6,14 +6,31 @@ app = Flask(__name__)
 # if __name__ == "__main__":
 #     app.run(use_reloader=False)
 
+global user_pw
+user_pw = ""
+while user_pw == "":
+    user_pw = input("Mitä salasanaa pyydetään? (Ei saa olla tyhjä) ")
+
 global db
 db = load_db()
 
 @app.route("/")
 def welcome():
-    return render_template("new_index.html")
+    return render_template("login_page.html")
 
-# funktio lähettää sivulle dataa db.jason tietostosta
+@app.route("/login", methods=['GET', 'POST'])
+def check_password():
+    global user_pw
+    given_pw = ""
+    if request.method == 'POST':
+        given_pw = request.form['pw'] # the password from the client
+
+    if given_pw == user_pw: # login succeeded
+        return render_template("new_index.html")
+    else:
+        return render_template("login_page.html") # let user try to log in again
+
+# funktio lähettää sivulle dataa db.json tietostosta
 @app.route("/eventlist")
 def eventlist():
     global db
