@@ -35,3 +35,97 @@ div.calendar_default_event_inner:hover {
   /* cursor: pointer; */
   background: #dbdaa6;
 }
+
+#context-menu {
+  position: fixed;
+  width: 150px;
+  background-color: #EFEFEF;
+  border-radius: 5px;
+  z-index: 99999;
+  transform: scale(0);
+  transform-origin: top left;
+}
+
+#context-menu .invoice {
+  padding: 5px;
+  font-size: 14px;
+  text-align: center;
+  cursor: default;
+  border-radius: 5px;
+}
+
+/* #context-menu .invoice:hover {
+  background: #00639e;
+} */
+
+#context-menu.visible {
+  transform: scale(1);
+  transition: transform 200ms ease-in-out;
+}
+
+#invoice_background {
+  position: fixed;
+  background-color: #000000;
+  opacity: 0.5;
+  inset: 0px;
+  z-index: 99999;
+}
+
+#invoice_modal {
+  position: absolute;
+  left: 50%;
+  top: 100px;
+  background-color: #FFFFFF;
+  border: 10px solid #CCCCCC;
+  width: 600px;
+  margin-left: -310px;
+  box-sizing: content-box;
+  z-index: 99999;
+}
+
+.form_header {
+  margin: 2px 0px;
+}
+
+.input_fields {
+  padding: 10px 0px;
+  position: relative;
+}
+
+#invoice_form {
+  padding: 20px;
+  
+}
+
+.price {
+  width: 50px;
+  float: right;
+}
+
+.price_field_header {
+  float: right;
+  width: 10%;
+}
+
+.service {
+  width: 400px;
+}
+
+.invoice_buttons {
+  display: block;
+  /* margin-top: 10px; */
+  padding: 10px 20px;
+  margin-bottom: 10px;
+}
+
+.invoice_button_cancel {
+  padding: 3px;
+  margin-right: 5px;
+  width: 80px;
+}
+
+.invoice_button_ok {
+  padding: 3px;
+  margin-right: 5px;
+  width: 80px;
+}

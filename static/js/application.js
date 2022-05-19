@@ -148,6 +148,7 @@ const dp = new DayPilot.Calendar("dp", {
 
     // Näytetään vanhat tiedot
     const modal = await DayPilot.Modal.form(form, args.e.data);
+    console.log(args.e.data)
     if (modal.canceled) {
       return;
     }
@@ -182,3 +183,146 @@ const dp = new DayPilot.Calendar("dp", {
 });
 dp.init();
 dp.loadEvents();
+
+// Function to close custom contextmenu
+function hideContextMenu() {
+  contextMenu.classList.remove("visible");
+}
+
+
+const bodyClick = document.querySelector("body");
+const contextMenu = document.getElementById("context-menu");
+
+// Open custom contextmenu only when rightclick on calendar event
+bodyClick.addEventListener("contextmenu", (e) => {
+  if (e.target && e.target.matches("div.calendar_default_event_inner")) {
+    e.preventDefault();
+    const { clientX: mouseX, clientY: mouseY }= e;
+
+    contextMenu.style.top = `${mouseY}px`;
+    contextMenu.style.left = `${mouseX}px`;
+
+    hideContextMenu();
+    setTimeout(() => {
+      contextMenu.classList.add("visible");
+    })
+  }
+
+  if (contextMenu.classList.contains("visible")) {
+    e.preventDefault();
+    hideContextMenu();
+  }
+
+  window.addEventListener("click", (clk) => {
+    if (clk.target.offsetParent != contextMenu) {
+      hideContextMenu();
+    }
+  });
+
+});
+
+
+var invoice_modal_active = false;
+bodyClick.addEventListener("click", (e) => {
+  if (e.target && e.target.matches(".invoice_button_cancel") || e.target.matches(".invoice_window_background")) {
+    invoice_modal.remove();
+    invoice_background.remove();
+    invoice_modal_active = false;
+  }
+});
+
+// Click on invoice button brings here. 
+function invoice() {
+  hideContextMenu();
+  invoiceModalCreate();
+  if (!invoice_modal_active) {
+    console.log("canceled")
+    return
+  }
+  console.log("not cancel")
+  
+
+// if (invoiceModalCanceled) {
+//   return;
+// }
+
+};
+
+//  For creating modal
+function invoiceModalCreate () {
+  
+  const invoice_background = document.createElement("div");
+  invoice_background.setAttribute("id", "invoice_background");
+  invoice_background.setAttribute("class", "invoice_window_background")
+
+  const invoice_modal = document.createElement("div");
+  invoice_modal.setAttribute("id", "invoice_modal");
+
+  const form_header = document.createElement("div");
+  form_header.setAttribute("class", "form_header");
+  const input_field_service_header = document.createElement("label");
+  input_field_service_header.setAttribute("class", "service_field_header");
+  input_field_service_header.textContent = "Service";
+  const input_field_price_header = document.createElement("label");
+  input_field_price_header.setAttribute("class", "price_field_header");
+  input_field_price_header.textContent = "Price";
+  form_header.appendChild(input_field_service_header);
+  form_header.appendChild(input_field_price_header);
+  
+  const invoice_form = document.createElement("div");
+  invoice_form.setAttribute("id", "invoice_form");
+
+  const input_field_1 = document.createElement("div");
+  input_field_1.setAttribute("class", "input_fields")
+  const input_field_serv = document.createElement("input");
+  input_field_serv.setAttribute("type", "text");
+  input_field_serv.setAttribute("name", "service1");
+  input_field_serv.setAttribute("class", "service");
+  const input_field_price = document.createElement("input");
+  input_field_price.setAttribute("type", "text");
+  input_field_price.setAttribute("name", "price1");
+  input_field_price.setAttribute("class", "price");
+  input_field_1.appendChild(input_field_serv);
+  input_field_1.appendChild(input_field_price);
+
+  const input_field_2 = document.createElement("div");
+  input_field_2.setAttribute("class", "input_fields")
+  const input_field_serv2 = document.createElement("input");
+  input_field_serv2.setAttribute("type", "text");
+  input_field_serv2.setAttribute("name", "service2");
+  input_field_serv2.setAttribute("class", "service");
+  const input_field_price2 = document.createElement("input");
+  input_field_price2.setAttribute("type", "text");
+  input_field_price2.setAttribute("name", "price2");
+  input_field_price2.setAttribute("class", "price");
+  input_field_2.appendChild(input_field_serv2);
+  input_field_2.appendChild(input_field_price2);
+
+
+
+  const invoice_buttons = document.createElement("div");
+  invoice_buttons.setAttribute("class", "invoice_buttons");
+  const ok_button = document.createElement("button");
+  ok_button.setAttribute("class", "invoice_button_ok")
+  ok_button.setAttribute("type", "button");
+  ok_button.textContent = "OK";
+  const cancel_button = document.createElement("button");
+  cancel_button.setAttribute("class", "invoice_button_cancel");
+  cancel_button.setAttribute("type", "button");
+  cancel_button.textContent = "Cancel";
+
+  invoice_form.appendChild(form_header);
+  invoice_form.appendChild(input_field_1);
+  invoice_form.appendChild(input_field_2);
+
+  invoice_buttons.appendChild(ok_button);
+  invoice_buttons.appendChild(cancel_button);
+  
+  invoice_modal.appendChild(invoice_form);
+  invoice_modal.appendChild(invoice_buttons);
+
+  document.body.appendChild(invoice_background);
+  document.body.appendChild(invoice_modal);
+
+  invoice_modal_active = true;
+};
