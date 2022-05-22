@@ -6,8 +6,6 @@ function change_view() {
   if (view == "Päivänäkymä") {
     nav.selectMode = "Day"
     dp.viewType = "Day"
-    // nav.update();
-    // dp.update();
     document.getElementById("change_view").innerHTML = "Viikkonäkymä";
   } else if (view == "Viikkonäkymä") {
     nav.selectMode = "Week"
@@ -89,9 +87,9 @@ const dp = new DayPilot.Calendar("dp", {
 
 
 
-  // Ajanvarauksen lisääminen
+  // To add reservation
 
-  //Luodaan popup lomake
+  //  Create modal
   onTimeRangeSelected: async (args) => {
     const form = [
       {name: "Reg. nro", id: "reg_nro"},
@@ -119,10 +117,10 @@ const dp = new DayPilot.Calendar("dp", {
       tyomaarays: modal.result.tyomaarays
     };
 
-    const {data} = await DayPilot.Http.post('/add_event', event); // Lähettää varaustiedot palvelimelle
+    const {data} = await DayPilot.Http.post('/add_event', event); // Send reservation data to server
 
       
-      // Lisää kalenteriin
+      // Add reservation to calendar
     dp.events.add({
       start: args.start,
       end: args.end,
@@ -187,66 +185,72 @@ dp.loadEvents();
 // Function to close custom contextmenu
 function hideContextMenu() {
   contextMenu.classList.remove("visible");
-}
+};
+
+function removeInvoiceModal() {
+  invoice_modal.remove();
+  invoice_background.remove();
+  invoice_modal_active = false;
+};
 
 
-const bodyClick = document.querySelector("body");
-const contextMenu = document.getElementById("context-menu");
 
 // Open custom contextmenu only when rightclick on calendar event
-bodyClick.addEventListener("contextmenu", (e) => {
+const contextMenu = document.getElementById("context-menu");
+window.addEventListener("contextmenu", (e) => {
   if (e.target && e.target.matches("div.calendar_default_event_inner")) {
     e.preventDefault();
-    const { clientX: mouseX, clientY: mouseY }= e;
-
+    const { clientX: mouseX, clientY: mouseY } = e;
+    
     contextMenu.style.top = `${mouseY}px`;
     contextMenu.style.left = `${mouseX}px`;
-
+    
     hideContextMenu();
     setTimeout(() => {
       contextMenu.classList.add("visible");
     })
-  }
+  } else {
+    hideContextMenu();
+  };
+  
+});
 
+window.addEventListener("click", (clk) => {
   if (contextMenu.classList.contains("visible")) {
-    e.preventDefault();
     hideContextMenu();
   }
-
-  window.addEventListener("click", (clk) => {
-    if (clk.target.offsetParent != contextMenu) {
-      hideContextMenu();
-    }
-  });
-
+  if (clk.target && clk.target.matches(".invoice_button_cancel") || clk.target.matches(".invoice_window_background")) {
+    removeInvoiceModal();
+  }
 });
+
 
 
 var invoice_modal_active = false;
-bodyClick.addEventListener("click", (e) => {
-  if (e.target && e.target.matches(".invoice_button_cancel") || e.target.matches(".invoice_window_background")) {
-    invoice_modal.remove();
-    invoice_background.remove();
-    invoice_modal_active = false;
-  }
-});
+
 
 // Click on invoice button brings here. 
 function invoice() {
   hideContextMenu();
   invoiceModalCreate();
-  if (!invoice_modal_active) {
-    console.log("canceled")
-    return
-  }
-  console.log("not cancel")
-  
-
-// if (invoiceModalCanceled) {
-//   return;
-// }
 
 };
+
+
+function sendData() {
+  const form_data = new FormData(document.querySelector("form"));
+  
+  const service_data = {
+    // service1: form_data.get("service1"),
+    // price1: form_data.get("price1")
+  };
+  for (let [key, value] of form_data) {
+    service_data[key] = value;
+  }
+  removeInvoiceModal();
+  console.log(service_data);
+}
+
 
 //  For creating modal
 function invoiceModalCreate () {
@@ -269,8 +273,9 @@ function invoiceModalCreate () {
   form_header.appendChild(input_field_service_header);
   form_header.appendChild(input_field_price_header);
   
-  const invoice_form = document.createElement("div");
+  const invoice_form = document.createElement("form");
   invoice_form.setAttribute("id", "invoice_form");
+  invoice_form.setAttribute("onsubmit", "sendData(); return false");
 
   const input_field_1 = document.createElement("div");
   input_field_1.setAttribute("class", "input_fields")
@@ -286,7 +291,7 @@ function invoiceModalCreate () {
   input_field_1.appendChild(input_field_price);
 
   const input_field_2 = document.createElement("div");
-  input_field_2.setAttribute("class", "input_fields")
+  input_field_2.setAttribute("class", "input_fields");
   const input_field_serv2 = document.createElement("input");
   input_field_serv2.setAttribute("type", "text");
   input_field_serv2.setAttribute("name", "service2");
@@ -304,7 +309,8 @@ function invoiceModalCreate () {
   invoice_buttons.setAttribute("class", "invoice_buttons");
   const ok_button = document.createElement("button");
   ok_button.setAttribute("class", "invoice_button_ok")
-  ok_button.setAttribute("type", "button");
+  ok_button.setAttribute("type", "submit");
+  ok_button.setAttribute("form", "invoice_form");
   ok_button.textContent = "OK";
   const cancel_button = document.createElement("button");
   cancel_button.setAttribute("class", "invoice_button_cancel");
