@@ -209,9 +209,11 @@ window.addEventListener("contextmenu", (e) => {
     setTimeout(() => {
       contextMenu.classList.add("visible");
     })
-  } else {
+  }
+
+  if (contextMenu.classList.contains("visible")) {
     hideContextMenu();
-  };
+  }
   
 });
 
@@ -252,9 +254,29 @@ function sendData() {
 }
 
 
+let row_index = 0;
+function addLine() {
+
+  const input_field_1 = document.createElement("div");
+  input_field_1.setAttribute("class", "input_fields")
+  const input_field_serv = document.createElement("input");
+  input_field_serv.setAttribute("type", "text");
+  input_field_serv.setAttribute("name", `service${row_index}`);
+  input_field_serv.setAttribute("class", "service");
+  const input_field_price = document.createElement("input");
+  input_field_price.setAttribute("type", "text");
+  input_field_price.setAttribute("name", `price${row_index}`);
+  input_field_price.setAttribute("class", "price");
+  input_field_1.appendChild(input_field_serv);
+  input_field_1.appendChild(input_field_price);
+  row_index++;
+  invoice_form.appendChild(input_field_1);
+  // return input_field_1;
+}
+
 //  For creating modal
 function invoiceModalCreate () {
-  
+  row_index = 0;
   const invoice_background = document.createElement("div");
   invoice_background.setAttribute("id", "invoice_background");
   invoice_background.setAttribute("class", "invoice_window_background")
@@ -277,34 +299,35 @@ function invoiceModalCreate () {
   invoice_form.setAttribute("id", "invoice_form");
   invoice_form.setAttribute("onsubmit", "sendData(); return false");
 
-  const input_field_1 = document.createElement("div");
-  input_field_1.setAttribute("class", "input_fields")
-  const input_field_serv = document.createElement("input");
-  input_field_serv.setAttribute("type", "text");
-  input_field_serv.setAttribute("name", "service1");
-  input_field_serv.setAttribute("class", "service");
-  const input_field_price = document.createElement("input");
-  input_field_price.setAttribute("type", "text");
-  input_field_price.setAttribute("name", "price1");
-  input_field_price.setAttribute("class", "price");
-  input_field_1.appendChild(input_field_serv);
-  input_field_1.appendChild(input_field_price);
-
-  const input_field_2 = document.createElement("div");
-  input_field_2.setAttribute("class", "input_fields");
-  const input_field_serv2 = document.createElement("input");
-  input_field_serv2.setAttribute("type", "text");
-  input_field_serv2.setAttribute("name", "service2");
-  input_field_serv2.setAttribute("class", "service");
-  const input_field_price2 = document.createElement("input");
-  input_field_price2.setAttribute("type", "text");
-  input_field_price2.setAttribute("name", "price2");
-  input_field_price2.setAttribute("class", "price");
-  input_field_2.appendChild(input_field_serv2);
-  input_field_2.appendChild(input_field_price2);
-
-
-
+  
+  // const input_field_1 = document.createElement("div");
+  // input_field_1.setAttribute("class", "input_fields")
+  // const input_field_serv = document.createElement("input");
+  // input_field_serv.setAttribute("type", "text");
+  // input_field_serv.setAttribute("name", "service1");
+  // input_field_serv.setAttribute("class", "service");
+  // const input_field_price = document.createElement("input");
+  // input_field_price.setAttribute("type", "text");
+  // input_field_price.setAttribute("name", "price1");
+  // input_field_price.setAttribute("class", "price");
+  // input_field_1.appendChild(input_field_serv);
+  // input_field_1.appendChild(input_field_price);
+  
+  // const input_field_2 = document.createElement("div");
+  // input_field_2.setAttribute("class", "input_fields");
+  // const input_field_serv2 = document.createElement("input");
+  // input_field_serv2.setAttribute("type", "text");
+  // input_field_serv2.setAttribute("name", "service2");
+  // input_field_serv2.setAttribute("class", "service");
+  // const input_field_price2 = document.createElement("input");
+  // input_field_price2.setAttribute("type", "text");
+  // input_field_price2.setAttribute("name", "price2");
+  // input_field_price2.setAttribute("class", "price");
+  // input_field_2.appendChild(input_field_serv2);
+  // input_field_2.appendChild(input_field_price2);
+  
+  
+  
   const invoice_buttons = document.createElement("div");
   invoice_buttons.setAttribute("class", "invoice_buttons");
   const ok_button = document.createElement("button");
@@ -316,19 +339,27 @@ function invoiceModalCreate () {
   cancel_button.setAttribute("class", "invoice_button_cancel");
   cancel_button.setAttribute("type", "button");
   cancel_button.textContent = "Cancel";
-
+  
+  const add_button = document.createElement("button");
+  add_button.setAttribute("class", "invoice_button_add");
+  add_button.setAttribute("type", "button");
+  add_button.setAttribute("onclick", "addLine()");
+  add_button.textContent = "Add";
+  
   invoice_form.appendChild(form_header);
-  invoice_form.appendChild(input_field_1);
-  invoice_form.appendChild(input_field_2);
-
+  // invoice_form.appendChild(input_field_1);
+  // invoice_form.appendChild(input_field_2);
+  
   invoice_buttons.appendChild(ok_button);
   invoice_buttons.appendChild(cancel_button);
+  invoice_buttons.appendChild(add_button);
   
   invoice_modal.appendChild(invoice_form);
   invoice_modal.appendChild(invoice_buttons);
-
+  
   document.body.appendChild(invoice_background);
   document.body.appendChild(invoice_modal);
-
+  
+  addLine();
   invoice_modal_active = true;
 };

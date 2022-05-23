@@ -25,6 +25,15 @@ a { display: block; height: auto; color: -webkit-link; cursor: pointer; text-dec
   color: #333333;
 } */
 
+.login {
+  display: flex;
+  /* position: fixed; */
+  padding: 10px 0px;
+  top: 50%;
+  justify-content: center;
+  left: 50%;
+}
+
 div.calendar_default_event_inner {
   background: linear-gradient(to left, #F5F763, #E0DD84);
   border-radius: 5px;
