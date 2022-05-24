@@ -6,7 +6,7 @@ def load_db():
     sqlite_connection = sqlite3.connect('database.db')
     try:
         sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT)')
-        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, tehtava TEXT, hinta TEXT) ')
+        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT) ')
         sqlite_connection.commit()
     except Exception as ex:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
