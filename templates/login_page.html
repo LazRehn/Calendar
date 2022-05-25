@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kirjaudu sisään autokorjaamon varauskalenteriin</title>
 
-  
   <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
 </head>
   
@@ -20,20 +19,26 @@
     </div>
 
     <div class="login">
-
       
       <!-- Sends password directly to backend flask -->
       <form method="post" action="/login">
-        Salasana: <input id="pw_field_id" type="password" name="pw">
-        <input type="submit" value="Submit">
+        <p></p>
+        <p>
+          Käyttäjä:<br>
+          <input id="username_field_id" type="text" name="username">
+        </p>
+        <p>
+          Salasana:<br>
+          <input id="pw_field_id" type="password" name="pw">
+        </p>
+        <p>
+          <input type="submit" value="Submit">
+        </p>
       </form>
       
     </div>
 
-
-
   </div>
-
 
 </body>
 </html>

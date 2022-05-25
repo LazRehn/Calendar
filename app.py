@@ -1,14 +1,16 @@
 from flask import Flask, render_template, jsonify, request, url_for,redirect
 #from  edit_db import load_db, append_db, move_db, update_db, delete_db
-from SQL_calls import load_db, append_db, move_db, update_db, delete_db
+from SQL_calls import load_db, append_db, move_db, update_db, delete_db,  get_services, add_services
 
 app = Flask(__name__)
 # if __name__ == "__main__":
 #     app.run(use_reloader=False)
 
 global user_pw
+user_name = ""
 user_pw = ""
 while user_pw == "":
+    user_name = input("Anna käyttäjänimi (Ei saa olla tyhjä) :")
     user_pw = input("Mitä salasanaa pyydetään? (Ei saa olla tyhjä) ")
 
 global db
@@ -20,22 +22,47 @@ def welcome():
 
 @app.route("/login", methods=['GET', 'POST'])
 def check_password():
+    global user_name
     global user_pw
+    given_username = ""
     given_pw = ""
     if request.method == 'POST':
+        given_username = request.form['username'] # the password from the client
         given_pw = request.form['pw'] # the password from the client
 
-    if given_pw == user_pw: # login succeeded
+    if given_username == user_name and given_pw == user_pw: # login succeeded
         return render_template("new_index.html")
     else:
         return render_template("login_page.html") # let user try to log in again
 
-# funktio lähettää sivulle dataa db.json tietostosta
+# funktio lähettää sivulle koko varauslistan json-muodossa
 @app.route("/eventlist")
 def eventlist():
     global db
-    test_json = jsonify(db)
-    return test_json
+    all_events_json = jsonify(db)
+    return all_events_json
+
+# lähettää tietyn varauksen tehtävät ja hinnat json-muodossa
+@app.route("/get_services", methods=["POST"])
+def get_services():
+    result = "NOT_OK"
+    if request.method == "POST":
+        event = request.get_json()
+        id = event["id"]
+        result = get_services(id)
+
+    service_lines = jsonify(result)
+    return service_lines
+
+# Tallentaa tietyn varauksen tehtävät ja hinnat
+@app.route("/add_services", methods=["POST"])
+def add_services():
+    global db
+    if request.method == "POST":
+        event = request.get_json()
+        id = event["id"]
+        line_list = event["line_list"]
+        add_services(id, line_list)
 
 # Tallentaa db.json tietostoon
 @app.route("/add_event", methods=["POST"])
@@ -53,6 +80,7 @@ def move_event():
     result = "NOT_OK"
     if request.method == "POST":
         event = request.get_json()
+        print(event)
         id = event["id"]
         for i in range(len(db)):
             if db[i]["id"]==str(id):

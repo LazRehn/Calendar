@@ -5,7 +5,8 @@ from unittest import result
 def load_db():
     sqlite_connection = sqlite3.connect('database.db')
     try:
-        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT)')
+        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT)')
+        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT) ')
         sqlite_connection.commit()
     except Exception as ex:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -44,6 +45,47 @@ def append_db(event):
             event["asiakas"],\
             event["puh_nro"],\
             event["tyomaarays"] ) )
+        sqlite_connection.commit()
+        result = "OK"
+    except Exception as ex:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(ex).__name__, ex.args)
+        print(message)
+        result = "NOT_OK"
+    return result
+
+def get_services(id):
+    sqlite_connection = sqlite3.connect('database.db')
+    sqlite_connection.row_factory = sqlite3.Row #without this line, fetchall will return Tuples, not Row objects!
+    sqlite_cursor = sqlite_connection.cursor()
+    sql_string = "SELECT service, price FROM services WHERE varaus_id = ? ORDER BY rivinumero;"
+    sqlite_cursor.execute(sql_string, (id,))
+
+    service_row_list = [] # a list of dictionaries, to enable jsonify(db)
+    for row in sqlite_cursor.fetchall():
+        print("Tietokantarivin luokka on: ", type(row)) # it should be sqlite.Row (not Tuple).
+        row_dictionary = {}
+        row_keys = row.keys()
+        row_values = tuple(row)
+        value_index = 0
+        # build a dictionary of this row
+        for key in row_keys:    # one key-value pair at a time
+            row_dictionary[key] = row_values[value_index] #could there be a smarter way?
+            value_index += 1
+        service_row_list.append(row_dictionary)
+    #sqlite_connection.close()  # not needed?
+    return service_row_list
+
+def add_services(varaus_id, line_list):
+    try:
+        sqlite_connection = sqlite3.connect('database.db')
+        sqlite_cursor = sqlite_connection.cursor()
+        line_index = 0
+        sql_string = "INSERT INTO services VALUES (?, ?, ?, ?);"
+        for row_dictionary in line_list:
+            line_index += 1
+            sqlite_cursor.execute(sql_string, (varaus_id, line_index, row_dictionary["service"], row_dictionary["price"]) )
+
         sqlite_connection.commit()
         result = "OK"
     except Exception as ex:
