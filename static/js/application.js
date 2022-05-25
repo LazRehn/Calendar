@@ -187,19 +187,20 @@ function hideContextMenu() {
   contextMenu.classList.remove("visible");
 };
 
+// Function to close invoice modal
 function removeInvoiceModal() {
   invoice_modal.remove();
   invoice_background.remove();
   invoice_modal_active = false;
 };
 
-
-
 // Open custom contextmenu only when rightclick on calendar event
+let event_id ="";
 const contextMenu = document.getElementById("context-menu");
 window.addEventListener("contextmenu", (e) => {
   if (e.target && e.target.matches("div.calendar_default_event_inner")) {
     e.preventDefault();
+    event_id = e.target.offsetParent.event.data.id;
     const { clientX: mouseX, clientY: mouseY } = e;
     
     contextMenu.style.top = `${mouseY}px`;
@@ -210,6 +211,12 @@ window.addEventListener("contextmenu", (e) => {
       contextMenu.classList.add("visible");
     })
   }
+
+  contextMenu.onclick = function() {
+    hideContextMenu();
+    invoiceModalCreate();
+  }
+
 
   if (contextMenu.classList.contains("visible")) {
     hideContextMenu();
@@ -232,47 +239,64 @@ var invoice_modal_active = false;
 
 
 // Click on invoice button brings here. 
-function invoice() {
-  hideContextMenu();
-  invoiceModalCreate();
-
-};
+// function invoice() {
+//   hideContextMenu();
+//   invoiceModalCreate();
+// };
 
 
 function sendData() {
   const form_data = new FormData(document.querySelector("form"));
   
-  const service_data = {
-    // service1: form_data.get("service1"),
-    // price1: form_data.get("price1")
-  };
+  const service_data = {};
+  service_data.id = event_id;
   for (let [key, value] of form_data) {
     service_data[key] = value;
   }
+
+  const invoice_db = new XMLHttpRequest();
+
+  // invoice_db.onreadystatechange = function() {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     console.log(this.response);
+  //   };
+  // }
+  invoice_db.open('POST', "/add_invoice", true);
+  invoice_db.setRequestHeader('Content-Type', 'application/json');
+  invoice_db.send(JSON.stringify(service_data));
+
   removeInvoiceModal();
-  console.log(service_data);
-}
+
+};
 
 
 let row_index = 0;
 function addLine() {
+  if (row_index < 15) {
+    const input_field = document.createElement("div");
+    input_field.setAttribute("class", "input_fields")
+    const input_field_serv = document.createElement("input");
+    input_field_serv.setAttribute("type", "text");
+    input_field_serv.setAttribute("class", "service");
+    input_field_serv.setAttribute("name", `service${row_index}`);
+    input_field_serv.setAttribute("required", "");
+    const input_field_price = document.createElement("input");
+    input_field_price.setAttribute("type", "text");
+    input_field_price.setAttribute("class", "price");
+    input_field_price.setAttribute("name", `price${row_index}`);
+    input_field_price.setAttribute("required", "");
+    input_field.appendChild(input_field_serv);
+    input_field.appendChild(input_field_price);
+    row_index++;
+    invoice_form.appendChild(input_field);
+  }
+};
 
-  const input_field_1 = document.createElement("div");
-  input_field_1.setAttribute("class", "input_fields")
-  const input_field_serv = document.createElement("input");
-  input_field_serv.setAttribute("type", "text");
-  input_field_serv.setAttribute("name", `service${row_index}`);
-  input_field_serv.setAttribute("class", "service");
-  const input_field_price = document.createElement("input");
-  input_field_price.setAttribute("type", "text");
-  input_field_price.setAttribute("name", `price${row_index}`);
-  input_field_price.setAttribute("class", "price");
-  input_field_1.appendChild(input_field_serv);
-  input_field_1.appendChild(input_field_price);
-  row_index++;
-  invoice_form.appendChild(input_field_1);
-  // return input_field_1;
-}
+function removeLine() {
+  if (invoice_form.childElementCount > 2) {
+    invoice_form.removeChild(invoice_form.lastChild);
+  }
+};
 
 //  For creating modal
 function invoiceModalCreate () {
@@ -288,10 +312,10 @@ function invoiceModalCreate () {
   form_header.setAttribute("class", "form_header");
   const input_field_service_header = document.createElement("label");
   input_field_service_header.setAttribute("class", "service_field_header");
-  input_field_service_header.textContent = "Service";
+  input_field_service_header.textContent = "Huoltotyö / varaosat / selite";
   const input_field_price_header = document.createElement("label");
   input_field_price_header.setAttribute("class", "price_field_header");
-  input_field_price_header.textContent = "Price";
+  input_field_price_header.textContent = "Hinta";
   form_header.appendChild(input_field_service_header);
   form_header.appendChild(input_field_price_header);
   
@@ -344,14 +368,19 @@ function invoiceModalCreate () {
   add_button.setAttribute("class", "invoice_button_add");
   add_button.setAttribute("type", "button");
   add_button.setAttribute("onclick", "addLine()");
-  add_button.textContent = "Add";
+  add_button.textContent = "Lisää rivi";
+  
+  const remove_button = document.createElement("button");
+  remove_button.setAttribute("class", "invoice_button_remove");
+  remove_button.setAttribute("type", "button");
+  remove_button.setAttribute("onclick", "removeLine()");
+  remove_button.textContent = "Poista rivi";
   
   invoice_form.appendChild(form_header);
-  // invoice_form.appendChild(input_field_1);
-  // invoice_form.appendChild(input_field_2);
   
   invoice_buttons.appendChild(ok_button);
   invoice_buttons.appendChild(cancel_button);
+  invoice_buttons.appendChild(remove_button);
   invoice_buttons.appendChild(add_button);
   
   invoice_modal.appendChild(invoice_form);

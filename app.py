@@ -96,3 +96,12 @@ def delete_event():
                 result = delete_db(event_id)
                 break
     return result
+
+
+@app.route("/add_invoice", methods=["POST"])
+def add_invoice():
+    if request.method == "POST":
+        event = request.get_json()
+        print(event)
+        print(type(event))
+        return event

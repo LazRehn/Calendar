@@ -83,7 +83,7 @@ div.calendar_default_event_inner:hover {
 #invoice_modal {
   position: absolute;
   left: 50%;
-  top: 100px;
+  top: 20px;
   background-color: #FFFFFF;
   border: 10px solid #CCCCCC;
   width: 600px;
@@ -97,7 +97,7 @@ div.calendar_default_event_inner:hover {
 }
 
 .input_fields {
-  padding: 10px 0px;
+  padding: 5px 0px;
   position: relative;
 }
 
@@ -136,4 +136,15 @@ div.calendar_default_event_inner:hover {
   padding: 3px;
   margin-right: 5px;
   width: 80px;
+}
+
+.invoice_button_add {
+  float: right;
+  padding: 3px;
+}
+
+.invoice_button_remove {
+  float: right;
+  padding: 3px;
+  margin-left: 5px;
 }
