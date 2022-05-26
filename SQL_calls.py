@@ -5,8 +5,10 @@ from unittest import result
 def load_db():
     sqlite_connection = sqlite3.connect('database.db')
     try:
-        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT)')
-        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT) ')
+        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT);')
+#   could also be sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY ASC, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT);')
+        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT, FOREIGN KEY (varaus_id) REFERENCES events (id) ON DELETE CASCADE);')
+      # sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT) ')
         sqlite_connection.commit()
     except Exception as ex:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -19,14 +21,18 @@ def load_db():
     db = [] # a list of dictionaries, to enable jsonify(db)
     for row in sqlite_cursor.fetchall():
         # print(type(row)) # it should be sqlite.Row (not Tuple).
-        row_dictionary = {}
-        row_keys = row.keys()
-        row_values = tuple(row)
-        value_index = 0
+        row_dictionary = dict(row)
+
+        # a more difficult way...
+#        row_dictionary = {}
+#        row_keys = row.keys()
+#        row_values = tuple(row)
+#        value_index = 0
         # build a dictionary of this row
-        for key in row_keys:    # one key-value pair at a time
-            row_dictionary[key] = row_values[value_index] #could there be a smarter way?
-            value_index += 1
+#        for key in row_keys:    # one key-value pair at a time
+#            row_dictionary[key] = row_values[value_index] #could there be a smarter way? Yes, just use dict(row)  ;-)
+#            value_index += 1
+ 
         db.append(row_dictionary)
     #sqlite_connection.close()  # not needed?
     return db
@@ -58,33 +64,54 @@ def get_services(id):
     sqlite_connection = sqlite3.connect('database.db')
     sqlite_connection.row_factory = sqlite3.Row #without this line, fetchall will return Tuples, not Row objects!
     sqlite_cursor = sqlite_connection.cursor()
-    sql_string = "SELECT service, price FROM services WHERE varaus_id = ? ORDER BY rivinumero;"
+    sql_string = "SELECT rivinumero service, price FROM services WHERE varaus_id = ? ORDER BY rivinumero;"
     sqlite_cursor.execute(sql_string, (id,))
 
-    service_row_list = [] # a list of dictionaries, to enable jsonify(db)
+    service_dictionary = {} # includes field names (service or price) and their values
     for row in sqlite_cursor.fetchall():
-        print("Tietokantarivin luokka on: ", type(row)) # it should be sqlite.Row (not Tuple).
+        wanted_row_dictionary = {}
+        #here we don't use dict(row)
+        row_keys = row.keys()
+        row_values = tuple(row)
+        row_number = row_values[0]
+        # build a dictionary of this row
+        wanted_row_dictionary[ row_keys[1] + row_number ] = row_values[1] # service field
+        wanted_row_dictionary[ row_keys[2] + row_number ] = row_values[2] # price field
+        service_dictionary.update(wanted_row_dictionary)
+    #sqlite_connection.close()  # not needed?
+    return service_dictionary
+
+    # previous version returned a list of dictionaries without field names
+    service_row_list = [] # a list of dictionaries, to enable jsonify()
+    for row in sqlite_cursor.fetchall():
         row_dictionary = {}
         row_keys = row.keys()
         row_values = tuple(row)
         value_index = 0
         # build a dictionary of this row
         for key in row_keys:    # one key-value pair at a time
-            row_dictionary[key] = row_values[value_index] #could there be a smarter way?
+            row_dictionary[key] = row_values[value_index] #could there be a smarter way? Yes, row_dictionary = dict(row)
             value_index += 1
         service_row_list.append(row_dictionary)
     #sqlite_connection.close()  # not needed?
     return service_row_list
 
-def add_services(varaus_id, line_list):
+#def add_services(varaus_id, line_list):
+def add_services(services):
     try:
         sqlite_connection = sqlite3.connect('database.db')
         sqlite_cursor = sqlite_connection.cursor()
-        line_index = 0
+#        line_index = 0
         sql_string = "INSERT INTO services VALUES (?, ?, ?, ?);"
-        for row_dictionary in line_list:
-            line_index += 1
-            sqlite_cursor.execute(sql_string, (varaus_id, line_index, row_dictionary["service"], row_dictionary["price"]) )
+        varaus_id = services["id"]
+
+        for line_index in range( len(services) // 2 ):
+            print(services["service"+str(line_index)], services["price"+str(line_index)] )
+            sqlite_cursor.execute(sql_string, (varaus_id, line_index, services["service"+str(line_index)], services["price"+str(line_index)]) )
+
+#        for row_dictionary in line_list:
+ #           line_index += 1
+  #          sqlite_cursor.execute(sql_string, (varaus_id, line_index, row_dictionary["service"], row_dictionary["price"]) )
 
         sqlite_connection.commit()
         result = "OK"

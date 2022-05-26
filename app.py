@@ -43,26 +43,26 @@ def eventlist():
     return all_events_json
 
 # lähettää tietyn varauksen tehtävät ja hinnat json-muodossa
-@app.route("/get_services", methods=["POST"])
-def get_services():
+@app.route("/get_invoice", methods=["POST"])
+def get_invoice():
     result = "NOT_OK"
     if request.method == "POST":
-        event = request.get_json()
-        id = event["id"]
+        id_dictionary = request.get_json()
+        id = id_dictionary["id"]
         result = get_services(id)
 
     service_lines = jsonify(result)
     return service_lines
 
 # Tallentaa tietyn varauksen tehtävät ja hinnat
-@app.route("/add_services", methods=["POST"])
-def add_services():
-    global db
+@app.route("/add_invoice", methods=["POST"])
+def add_invoice():
     if request.method == "POST":
-        event = request.get_json()
-        id = event["id"]
-        line_list = event["line_list"]
-        add_services(id, line_list)
+        services = request.get_json()
+        add_services(services)
+#        id = event["id"]
+ #       line_list = event["line_list"]
+  #      add_services(id, line_list)
 
 # Tallentaa db.json tietostoon
 @app.route("/add_event", methods=["POST"])
@@ -126,8 +126,8 @@ def delete_event():
     return result
 
 
-@app.route("/add_invoice", methods=["POST"])
-def add_invoice():
+@app.route("/add_invoice_testing_only", methods=["POST"])
+def add_invoice_testing():
     if request.method == "POST":
         event = request.get_json()
         print(event)
