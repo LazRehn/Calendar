@@ -72,7 +72,6 @@ def add_event():
     global db
     if request.method == "POST":
         event = request.get_json()
-        print(event)
         db.append(event)
         append_db(event)
         return event

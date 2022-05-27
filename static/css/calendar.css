@@ -35,14 +35,16 @@ a { display: block; height: auto; color: -webkit-link; cursor: pointer; text-dec
 }
 
 div.calendar_default_event_inner {
-  background: linear-gradient(to left, #F5F763, #E0DD84);
+  /* background: linear-gradient(to left, #F5F763, #E0DD84); */
   border-radius: 5px;
   /* transition: background 2ms; */;
 }
 
 div.calendar_default_event_inner:hover {
   /* cursor: pointer; */
-  background: #dbdaa6;
+  /* background: #dbdaa6 !important; */
+  border: 2px solid #011329 !important;
+  color: #000000 !important;
 }
 
 #context-menu {

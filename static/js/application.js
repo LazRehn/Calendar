@@ -49,12 +49,19 @@ const dp = new DayPilot.Calendar("dp", {
 
   // Varauksen muotoilu
   onBeforeEventRender: args => {
+    console.log(args);
     args.data.html = "<b>Reg nro:</b> "
     +args.data.reg_nro+" <b>Merkki:</b> "
     +args.data.merkki+"<br>"+"<b>Asiakas:</b> "
     +args.data.asiakas+"<br>"+ args.data.puh_nro+"<br>"
     +"<b>Työmääräys / selite:</b> <br>"
-    +args.data.tyomaarays;
+    +args.data.tyomaarays
+
+    if (args.data.invoice === 0) {
+      args.data.backColor = "linear-gradient(to left, #F5F763, #E0DD84)";
+    } else if (args.data.invoice === 1) {
+      args.data.backColor = "linear-gradient(to left, #6CF763, #56D56C)";
+    };
   },
 
   // Poistaa tapahtuman
@@ -115,7 +122,7 @@ const dp = new DayPilot.Calendar("dp", {
       asiakas: modal.result.asiakas,
       puh_nro: modal.result.puh_nro,
       tyomaarays: modal.result.tyomaarays,
-      invoice: 0
+      invoice: 1
     };
 
     const {data} = await DayPilot.Http.post('/add_event', event); // Send reservation data to server
@@ -240,13 +247,6 @@ window.addEventListener("click", (clk) => {
 var invoice_modal_active = false;
 
 
-// Click on invoice button brings here. 
-// function invoice() {
-//   hideContextMenu();
-//   invoiceModalCreate();
-// };
-
-
 function sendData() {
   const form_data = new FormData(document.querySelector("form"));
   
@@ -260,6 +260,7 @@ function sendData() {
 
   invoice_db.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
+      dp.update();
       console.log(this.response);
     };
   }
