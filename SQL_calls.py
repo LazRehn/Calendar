@@ -24,22 +24,14 @@ def load_db():
         # print(type(row)) # it should be sqlite.Row (not Tuple).
         row_dictionary = dict(row)
 
-        # a more difficult way...
-#        row_dictionary = {}
-#        row_keys = row.keys()
-#        row_values = tuple(row)
-#        value_index = 0
-        # build a dictionary of this row
-#        for key in row_keys:    # one key-value pair at a time
-#            row_dictionary[key] = row_values[value_index] #could there be a smarter way? Yes, just use dict(row)  ;-)
-#            value_index += 1
+        # 
+        
  
         db.append(row_dictionary)
     #sqlite_connection.close()  # not needed?
     return db
 
 def append_db(event):
-    print(event)
     try:
         sqlite_connection = sqlite3.connect('database.db')
         sqlite_cursor = sqlite_connection.cursor()
