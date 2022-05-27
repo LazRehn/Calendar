@@ -35,6 +35,7 @@ def check_password():
 
 global db
 db = load_db()
+print("Loaded complete db with ", len(db), " elements.")
 
 # funktio lähettää sivulle koko varauslistan json-muodossa
 @app.route("/eventlist")
@@ -83,7 +84,7 @@ def move_event():
     result = "NOT_OK"
     if request.method == "POST":
         event = request.get_json()
-        print(event)
+#        print(event)
         id = event["id"]
         for i in range(len(db)):
             if db[i]["id"]==str(id):
@@ -91,6 +92,12 @@ def move_event():
                 db[i]["end"] = event["newEnd"]
                 result = move_db(event)
                 break
+
+      # just to test get_services
+#        services_test = get_services(id)
+#        print(services_test)
+#        service_lines_test = jsonify(result)
+#        print(service_lines_test)
     return result
 
 @app.route("/update_event", methods=["POST"])
