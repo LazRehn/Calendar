@@ -2,14 +2,14 @@ import sqlite3
 from unittest import result
 
 # Builds the list of events "db" from the database
-def load_db():
+def load_db(start_time, end_time):
     sqlite_connection = sqlite3.connect('database.db')
     try:
         sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT, invoice INT NOT NULL CHECK (invoice IN (0, 1)));')
-#        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT, invoice INT NOT NULL CHECK (invoice IN (0, 1)), FOREIGN KEY (id) REFERENCES services (varaus_id) ON DELETE CASCADE);')
-#   could also be sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY ASC, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT);')
-#        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT, FOREIGN KEY (varaus_id) REFERENCES events (id) ON DELETE CASCADE);')
+#       sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT, invoice INT NOT NULL CHECK (invoice IN (0, 1)), FOREIGN KEY (id) REFERENCES services (varaus_id) ON DELETE CASCADE);')
+#       sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY ASC, ... # to get automatic id
         sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT);')
+#       sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT, FOREIGN KEY (varaus_id) REFERENCES events (id) ON DELETE CASCADE);')
         sqlite_connection.commit()
     except Exception as ex:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -18,15 +18,14 @@ def load_db():
     
     sqlite_connection.row_factory = sqlite3.Row #without this line, fetchall will return Tuples, not Row objects!
     sqlite_cursor = sqlite_connection.cursor()
-    sqlite_cursor.execute('SELECT * FROM events ORDER BY start')
+
+    sql_string = "SELECT * FROM events WHERE start BETWEEN ? AND ? ORDER BY start;"
+    sqlite_cursor.execute(sql_string, (start_time, end_time))
+
     db = [] # a list of dictionaries, to enable jsonify(db)
     for row in sqlite_cursor.fetchall():
         # print(type(row)) # it should be sqlite.Row (not Tuple).
         row_dictionary = dict(row)
-
-        # 
-        
- 
         db.append(row_dictionary)
     #sqlite_connection.close()  # not needed?
     return db
@@ -97,7 +96,6 @@ def add_services(services):
     try:
         sqlite_connection = sqlite3.connect('database.db')
         sqlite_cursor = sqlite_connection.cursor()
-#        line_index = 0
         sql_string = "INSERT INTO services VALUES (?, ?, ?, ?);"
         varaus_id = services["id"]
 
@@ -108,8 +106,9 @@ def add_services(services):
         sql_string = "UPDATE events SET invoice = ? WHERE id = ?"
         sqlite_cursor.execute(sql_string, ( 1, varaus_id ))
 
-#       Old version
-#        for row_dictionary in line_list:
+#    Old version:
+#       line_index = 0
+#       for row_dictionary in line_list:
 #           line_index += 1
 #           sqlite_cursor.execute(sql_string, (varaus_id, line_index, row_dictionary["service"], row_dictionary["price"]) )
 
@@ -124,7 +123,6 @@ def add_services(services):
 
 def move_db(event):
     sql_string = "UPDATE events SET start = ?, end = ? WHERE id = ?"
-
     try:
         sqlite_connection = sqlite3.connect('database.db')
         sqlite_cursor = sqlite_connection.cursor()

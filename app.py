@@ -13,7 +13,8 @@ user_pw = ""
 #     user_name = input("Anna käyttäjänimi (Ei saa olla tyhjä) :")
 #     user_pw = input("Mitä salasanaa pyydetään? (Ei saa olla tyhjä) ")
 
-
+# This page is shown in the beginnig
+# Also logging out could just reload the login page
 @app.route("/")
 def welcome():
     return render_template("login_page.html")
@@ -34,15 +35,23 @@ def check_password():
         return render_template("login_page.html") # let user try to log in again
 
 global db
-db = load_db()
-print("Loaded complete db with ", len(db), " elements.")
 
 # funktio lähettää sivulle koko varauslistan json-muodossa
-@app.route("/eventlist")
-def eventlist():
+@app.route("/eventlist") # GET by default
+def eventlist():  # uses date limits
     global db
-    all_events_json = jsonify(db)
-    return all_events_json
+    if request.method != "GET":
+        print("Expected GET method in function eventlist!")
+
+    start=request.values.get('start')
+    end = request.values.get('end')
+    db = load_db(start, end)
+    print("Loaded db with ", len(db), " elements.")
+    events_list = jsonify(db)
+    return events_list
+
+    data = request.get_json() # ei toimi tässä
+
 
 # lähettää tietyn varauksen tehtävät ja hinnat json-muodossa
 @app.route("/get_invoice", methods=["POST"])
@@ -61,10 +70,14 @@ def get_invoice():
 def add_invoice():
     if request.method == "POST":
         services = request.get_json()
-        add_services(services)
-        # id = event["id"]
-        # line_list = event["line_list"]
-        # add_services(id, line_list)
+        add_services(services) # also sets the invoice fiels to 1 in the events database table
+
+        id = services["id"]
+        for i in range(len(db)):
+            if db[i]["id"]==str(id):
+                db[i]["invoice"] = 1
+                break
+
         return services
 
 # Tallentaa db.json tietostoon
@@ -92,7 +105,7 @@ def move_event():
                 result = move_db(event)
                 break
 
-      # just to test get_services
+      # just to test if get_services works
 #        services_test = get_services(id)
 #        print(services_test)
 #        service_lines_test = jsonify(result)
@@ -130,7 +143,7 @@ def delete_event():
         for i in range(len(db)):
             if db[i]["id"]==event_id:
                 del db[i]
-                result = delete_db(event_id)
+                result = delete_db(event_id) # also deletes the service lines for the event
                 break
     return result
 
