@@ -114,7 +114,8 @@ const dp = new DayPilot.Calendar("dp", {
       merkki: modal.result.merkki,
       asiakas: modal.result.asiakas,
       puh_nro: modal.result.puh_nro,
-      tyomaarays: modal.result.tyomaarays
+      tyomaarays: modal.result.tyomaarays,
+      invoice: 0
     };
 
     const {data} = await DayPilot.Http.post('/add_event', event); // Send reservation data to server
@@ -129,7 +130,8 @@ const dp = new DayPilot.Calendar("dp", {
       merkki: data.merkki,
       asiakas: data.asiakas,
       puh_nro: data.puh_nro,
-      tyomaarays: data.tyomaarays
+      tyomaarays: data.tyomaarays,
+      invoice: data.invoice
     });
       // console.log("Created.");
   },
@@ -256,11 +258,11 @@ function sendData() {
 
   const invoice_db = new XMLHttpRequest();
 
-  // invoice_db.onreadystatechange = function() {
-  //   if (this.readyState == 4 && this.status == 200) {
-  //     console.log(this.response);
-  //   };
-  // }
+  invoice_db.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.response);
+    };
+  }
   invoice_db.open('POST', "/add_invoice", true);
   invoice_db.setRequestHeader('Content-Type', 'application/json');
   invoice_db.send(JSON.stringify(service_data));

@@ -5,7 +5,7 @@ from unittest import result
 def load_db():
     sqlite_connection = sqlite3.connect('database.db')
     try:
-        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT);')
+        sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY ON CONFLICT FAIL, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT, invoice INT NOT NULL CHECK (invoice IN (0, 1)));')
 #   could also be sqlite_connection.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY ASC, start TEXT, end TEXT, reg_nro TEXT, merkki TEXT, asiakas TEXT, puh_nro TEXT, tyomaarays TEXT);')
         sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT, FOREIGN KEY (varaus_id) REFERENCES events (id) ON DELETE CASCADE);')
       # sqlite_connection.execute('CREATE TABLE IF NOT EXISTS services (varaus_id TEXT, rivinumero INTEGER, service TEXT, price TEXT) ')
@@ -38,10 +38,11 @@ def load_db():
     return db
 
 def append_db(event):
+    print(event)
     try:
         sqlite_connection = sqlite3.connect('database.db')
         sqlite_cursor = sqlite_connection.cursor()
-        sql_string = "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, ?);"
+        sql_string = "INSERT INTO events VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"
         sqlite_cursor.execute(sql_string, (
             event["id"],\
             event["start"],
@@ -50,7 +51,8 @@ def append_db(event):
             event["merkki"],\
             event["asiakas"],\
             event["puh_nro"],\
-            event["tyomaarays"] ) )
+            event["tyomaarays"],
+            event["invoice"] ) )
         sqlite_connection.commit()
         result = "OK"
     except Exception as ex:

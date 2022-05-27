@@ -9,12 +9,10 @@ app = Flask(__name__)
 global user_pw
 user_name = ""
 user_pw = ""
-while user_pw == "":
-    user_name = input("Anna käyttäjänimi (Ei saa olla tyhjä) :")
-    user_pw = input("Mitä salasanaa pyydetään? (Ei saa olla tyhjä) ")
+# while user_pw == "":
+#     user_name = input("Anna käyttäjänimi (Ei saa olla tyhjä) :")
+#     user_pw = input("Mitä salasanaa pyydetään? (Ei saa olla tyhjä) ")
 
-global db
-db = load_db()
 
 @app.route("/")
 def welcome():
@@ -34,6 +32,9 @@ def check_password():
         return render_template("new_index.html")
     else:
         return render_template("login_page.html") # let user try to log in again
+
+global db
+db = load_db()
 
 # funktio lähettää sivulle koko varauslistan json-muodossa
 @app.route("/eventlist")
@@ -60,9 +61,10 @@ def add_invoice():
     if request.method == "POST":
         services = request.get_json()
         add_services(services)
-#        id = event["id"]
- #       line_list = event["line_list"]
-  #      add_services(id, line_list)
+        # id = event["id"]
+        # line_list = event["line_list"]
+        # add_services(id, line_list)
+        return services
 
 # Tallentaa db.json tietostoon
 @app.route("/add_event", methods=["POST"])
@@ -70,6 +72,7 @@ def add_event():
     global db
     if request.method == "POST":
         event = request.get_json()
+        print(event)
         db.append(event)
         append_db(event)
         return event
