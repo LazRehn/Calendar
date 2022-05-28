@@ -122,7 +122,7 @@ const dp = new DayPilot.Calendar("dp", {
       asiakas: modal.result.asiakas,
       puh_nro: modal.result.puh_nro,
       tyomaarays: modal.result.tyomaarays,
-      invoice: 1
+      invoice: 0
     };
 
     const {data} = await DayPilot.Http.post('/add_event', event); // Send reservation data to server
@@ -204,12 +204,12 @@ function removeInvoiceModal() {
 };
 
 // Open custom contextmenu only when rightclick on calendar event
-let event_id ="";
+let click_right =MouseEvent;
 const contextMenu = document.getElementById("context-menu");
 window.addEventListener("contextmenu", (e) => {
   if (e.target && e.target.matches("div.calendar_default_event_inner")) {
     e.preventDefault();
-    event_id = e.target.offsetParent.event.data.id;
+    click_right = e;
     const { clientX: mouseX, clientY: mouseY } = e;
     
     contextMenu.style.top = `${mouseY}px`;
@@ -251,7 +251,7 @@ function sendData() {
   const form_data = new FormData(document.querySelector("form"));
   
   const service_data = {};
-  service_data.id = event_id;
+  service_data.id = click_right.target.offsetParent.event.data.id;
   for (let [key, value] of form_data) {
     service_data[key] = value;
   }
@@ -260,6 +260,7 @@ function sendData() {
 
   invoice_db.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
+      click_right.target.offsetParent.event.data.invoice = 1;
       dp.update();
       console.log(this.response);
     };
