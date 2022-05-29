@@ -49,7 +49,6 @@ const dp = new DayPilot.Calendar("dp", {
 
   // Varauksen muotoilu
   onBeforeEventRender: args => {
-    console.log(args);
     args.data.html = "<b>Reg nro:</b> "
     +args.data.reg_nro+" <b>Merkki:</b> "
     +args.data.merkki+"<br>"+"<b>Asiakas:</b> "
@@ -204,7 +203,7 @@ function removeInvoiceModal() {
 };
 
 // Open custom contextmenu only when rightclick on calendar event
-let click_right =MouseEvent;
+let click_right = MouseEvent;
 const contextMenu = document.getElementById("context-menu");
 window.addEventListener("contextmenu", (e) => {
   if (e.target && e.target.matches("div.calendar_default_event_inner")) {
@@ -224,8 +223,37 @@ window.addEventListener("contextmenu", (e) => {
   contextMenu.onclick = function() {
     hideContextMenu();
     invoiceModalCreate();
-  }
 
+    if (e.target.offsetParent.event.data.invoice == 1) {
+      const event_id = {};
+      event_id.id = click_right.target.offsetParent.event.data.id;
+      const invoice_db = new XMLHttpRequest();
+      
+      invoice_db.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          let invoice_data = JSON.parse(this.response);
+          form_lines = Object.keys(invoice_data).length / 2;
+
+          invoice_modal.removeChild(invoice_modal.lastChild); // Removes buttons from invoice modal
+          while (row_index < form_lines) {
+            addLine();
+          }
+          
+          for (let key in invoice_data) {
+            console.log(`${key} : ${invoice_data[key]}`);
+            document.forms["invoice_form"][key].value = invoice_data[key];
+          }
+          
+          console.log(invoice_data);
+          console.log(Object.keys(invoice_data).length/2);
+          
+        };
+      }
+      invoice_db.open('POST', "/get_invoice", true);
+      invoice_db.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+      invoice_db.send(JSON.stringify(event_id));
+    };
+  }
 
   if (contextMenu.classList.contains("visible")) {
     hideContextMenu();
@@ -242,10 +270,7 @@ window.addEventListener("click", (clk) => {
   }
 });
 
-
-
 var invoice_modal_active = false;
-
 
 function sendData() {
   const form_data = new FormData(document.querySelector("form"));
@@ -256,17 +281,17 @@ function sendData() {
     service_data[key] = value;
   }
 
+
   const invoice_db = new XMLHttpRequest();
 
   invoice_db.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       click_right.target.offsetParent.event.data.invoice = 1;
       dp.update();
-      console.log(this.response);
     };
   }
   invoice_db.open('POST', "/add_invoice", true);
-  invoice_db.setRequestHeader('Content-Type', 'application/json');
+  invoice_db.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   invoice_db.send(JSON.stringify(service_data));
 
   removeInvoiceModal();
@@ -284,11 +309,14 @@ function addLine() {
     input_field_serv.setAttribute("class", "service");
     input_field_serv.setAttribute("name", `service${row_index}`);
     input_field_serv.setAttribute("required", "");
+    input_field_serv.setAttribute("value", "");
     const input_field_price = document.createElement("input");
     input_field_price.setAttribute("type", "text");
     input_field_price.setAttribute("class", "price");
     input_field_price.setAttribute("name", `price${row_index}`);
     input_field_price.setAttribute("required", "");
+    input_field_price.setAttribute("value", "");
+
     input_field.appendChild(input_field_serv);
     input_field.appendChild(input_field_price);
     row_index++;
@@ -326,34 +354,6 @@ function invoiceModalCreate () {
   const invoice_form = document.createElement("form");
   invoice_form.setAttribute("id", "invoice_form");
   invoice_form.setAttribute("onsubmit", "sendData(); return false");
-
-  
-  // const input_field_1 = document.createElement("div");
-  // input_field_1.setAttribute("class", "input_fields")
-  // const input_field_serv = document.createElement("input");
-  // input_field_serv.setAttribute("type", "text");
-  // input_field_serv.setAttribute("name", "service1");
-  // input_field_serv.setAttribute("class", "service");
-  // const input_field_price = document.createElement("input");
-  // input_field_price.setAttribute("type", "text");
-  // input_field_price.setAttribute("name", "price1");
-  // input_field_price.setAttribute("class", "price");
-  // input_field_1.appendChild(input_field_serv);
-  // input_field_1.appendChild(input_field_price);
-  
-  // const input_field_2 = document.createElement("div");
-  // input_field_2.setAttribute("class", "input_fields");
-  // const input_field_serv2 = document.createElement("input");
-  // input_field_serv2.setAttribute("type", "text");
-  // input_field_serv2.setAttribute("name", "service2");
-  // input_field_serv2.setAttribute("class", "service");
-  // const input_field_price2 = document.createElement("input");
-  // input_field_price2.setAttribute("type", "text");
-  // input_field_price2.setAttribute("name", "price2");
-  // input_field_price2.setAttribute("class", "price");
-  // input_field_2.appendChild(input_field_serv2);
-  // input_field_2.appendChild(input_field_price2);
-  
   
   
   const invoice_buttons = document.createElement("div");
