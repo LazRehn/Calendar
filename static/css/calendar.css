@@ -34,6 +34,11 @@ a { display: block; height: auto; color: -webkit-link; cursor: pointer; text-dec
   left: 50%;
 }
 
+.error {
+  position: fixed;
+  top: 280px;
+}
+
 div.calendar_default_event_inner {
   /* background: linear-gradient(to left, #F5F763, #E0DD84); */
   border-radius: 5px;

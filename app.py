@@ -1,38 +1,50 @@
-from flask import Flask, render_template, jsonify, request, url_for,redirect
+from flask import Flask, render_template, jsonify, request, url_for,redirect, session
 #from  edit_db import load_db, append_db, move_db, update_db, delete_db
 from SQL_calls import load_db, append_db, move_db, update_db, delete_db,  get_services, add_services
+from functools import wraps
+
 
 app = Flask(__name__)
 # if __name__ == "__main__":
 #     app.run(use_reloader=False)
 
-global user_pw
-user_name = ""
-user_pw = ""
-# while user_pw == "":
-#     user_name = input("Anna käyttäjänimi (Ei saa olla tyhjä) :")
-#     user_pw = input("Mitä salasanaa pyydetään? (Ei saa olla tyhjä) ")
+app.secret_key = 'mykey'
+
+def access_required(f):
+    @wraps(f)
+    def access(*args, **kwargs):
+        if not 'logged_in' in session:
+            return redirect(url_for('login'))
+        else:
+            return f(*args, **kwargs)
+    return access
+       
+
+# Main calendar page
+@app.route("/")
+@access_required
+def main_page():
+    return render_template("new_index.html")
 
 # This page is shown in the beginnig
-# Also logging out could just reload the login page
-@app.route("/")
-def welcome():
-    return render_template("login_page.html")
+# Also logging out reloads the login page
 
 @app.route("/login", methods=['GET', 'POST'])
-def check_password():
-    global user_name
-    global user_pw
-    given_username = ""
-    given_pw = ""
+def login():
+    error = None
     if request.method == 'POST':
-        given_username = request.form['username'] # the password from the client
-        given_pw = request.form['pw'] # the password from the client
+        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+            error = 'Kirjautuminen ei onnistunut!'
+        else:
+            session['accessed'] = True
+            return redirect(url_for('main_page'))
+    return render_template('login_page.html', error= error)
 
-    if given_username == user_name and given_pw == user_pw: # login succeeded
-        return render_template("new_index.html")
-    else:
-        return render_template("login_page.html") # let user try to log in again
+@app.route('/logout')
+def logout():
+    session.pop('accessed', None)
+    return redirect(url_for('login'))
+
 
 global db
 

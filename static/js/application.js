@@ -36,9 +36,10 @@ const dp = new DayPilot.Calendar("dp", {
   viewType: "WorkWeek",
   businessBeginsHour: 8,
   // dayBeginsHour: 8,
-  // dayEndsHour: 19,
+  businessEndsHour: 18,
   locale: "fi-fi",
   durationBarVisible : false,
+  // showNonBusiness: false,
 
   headerDateFormat: "dddd dd.MM.yyyy",
   eventDeleteHandling: "Update",
@@ -64,12 +65,26 @@ const dp = new DayPilot.Calendar("dp", {
   },
 
   // Poistaa tapahtuman
+  onEventDelete: function(args) {
+    if (!confirm("Do you really want to delete this event?")) {
+      args.preventDefault();
+    }
+  },
+
+
+
   onEventDeleted: async (args) => {
     const data = {
     id: args.e.id()
     };
     await DayPilot.Http.post('/delete_event', data);
     // console.log("Deleted");
+  },
+
+  onEventMove: function (args) {
+    if (!confirm("Move event?")) {
+      args.preventDefault();
+    }
   },
 
   onEventMoved: async (args) => {

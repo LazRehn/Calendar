@@ -21,20 +21,22 @@
     <div class="login">
       
       <!-- Sends password directly to backend flask -->
-      <form method="post" action="/login">
-        <p></p>
+      <form method="POST" action="">
         <p>
           Käyttäjä:<br>
-          <input id="username_field_id" type="text" name="username">
+          <input id="username" type="text" name="username">
         </p>
         <p>
           Salasana:<br>
-          <input id="pw_field_id" type="password" name="pw">
+          <input id="password" type="password" name="password">
         </p>
         <p>
-          <input type="submit" value="Submit">
+          <input type="submit" value="Login">
         </p>
       </form>
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
       
     </div>
 
