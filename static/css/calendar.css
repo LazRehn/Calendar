@@ -9,12 +9,17 @@ a { display: block; height: auto; color: -webkit-link; cursor: pointer; text-dec
   padding: 10px; margin-top: 5px;
 }
 
-#booking, #change_view {
+#booking, #change_view, #logout_button {
   width: 212px;
-  height: 50px;
+  height: 40px;
   padding: 0px;
-  font-size: 15px;
+  font-size: 14px;
   color: #333333;
+}
+
+#logout_button {
+  position: relative;
+  bottom: -260px;
 }
 
 /* #day {

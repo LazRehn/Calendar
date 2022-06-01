@@ -13,10 +13,10 @@ app.secret_key = 'mykey'
 def access_required(f):
     @wraps(f)
     def access(*args, **kwargs):
-        if not 'logged_in' in session:
-            return redirect(url_for('login'))
-        else:
+        if 'accessed' in session:
             return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
     return access
        
 
@@ -43,7 +43,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('accessed', None)
-    return redirect(url_for('login'))
+    return redirect('/')
 
 
 global db
