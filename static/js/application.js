@@ -1,6 +1,6 @@
 
 
-// Change calendar view, between day and week, when button is pressed in browser
+// To change calendar view between day and week, when button is pressed in browser
 function change_view() {
   const view = document.getElementById("change_view").innerHTML;
   if (view == "Päivänäkymä") {
@@ -16,7 +16,7 @@ function change_view() {
   dp.update();
 };
 
-// Näyttää kuukausikalenterin, jossa mahdollisuus valita viikkokalenteri
+// Show month calendar for selecting days/weeks
 const nav = new DayPilot.Navigator("nav", {
   showMonths: 1,
   skipMonths: 1,
@@ -35,11 +35,10 @@ nav.init();
 const dp = new DayPilot.Calendar("dp", {
   viewType: "WorkWeek",
   businessBeginsHour: 8,
-  // dayBeginsHour: 8,
   businessEndsHour: 18,
   locale: "fi-fi",
   durationBarVisible : false,
-  // showNonBusiness: false,
+  heightSpec: "BusinessHoursNoScroll",
 
   headerDateFormat: "dddd dd.MM.yyyy",
   eventDeleteHandling: "Update",
@@ -54,8 +53,7 @@ const dp = new DayPilot.Calendar("dp", {
     +args.data.reg_nro+" <b>Merkki:</b> "
     +args.data.merkki+"<br>"+"<b>Asiakas:</b> "
     +args.data.asiakas+"<br>"+ args.data.puh_nro+"<br>"
-    +"<b>Työmääräys / selite:</b> <br>"
-    +args.data.tyomaarays
+    +"<b>Työmääräys / selite:</b> <br>"+args.data.tyomaarays
 
     if (args.data.invoice === 0) {
       args.data.backColor = "linear-gradient(to left, #F5F763, #E0DD84)";
@@ -66,12 +64,10 @@ const dp = new DayPilot.Calendar("dp", {
 
   // Poistaa tapahtuman
   onEventDelete: function(args) {
-    if (!confirm("Do you really want to delete this event?")) {
+    if (!confirm("Haluatko varmasti poistaa varauksen?")) {
       args.preventDefault();
     }
   },
-
-
 
   onEventDeleted: async (args) => {
     const data = {
@@ -82,7 +78,7 @@ const dp = new DayPilot.Calendar("dp", {
   },
 
   onEventMove: function (args) {
-    if (!confirm("Move event?")) {
+    if (!confirm("Haluatko muuttaa varauksen ajankohtaa?")) {
       args.preventDefault();
     }
   },
@@ -107,10 +103,9 @@ const dp = new DayPilot.Calendar("dp", {
   },
 
 
-
   // To add reservation
 
-  //  Create modal
+  //  Create modal popup
   onTimeRangeSelected: async (args) => {
     const form = [
       {name: "Reg. nro", id: "reg_nro"},
