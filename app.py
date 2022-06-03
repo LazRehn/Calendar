@@ -50,6 +50,7 @@ global db
 
 # funktio lähettää sivulle koko varauslistan json-muodossa
 @app.route("/eventlist") # GET by default
+@access_required
 def eventlist():  # uses date limits
     global db
     if request.method != "GET":

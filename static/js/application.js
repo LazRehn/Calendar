@@ -39,7 +39,6 @@ const dp = new DayPilot.Calendar("dp", {
   locale: "fi-fi",
   durationBarVisible : false,
   heightSpec: "BusinessHoursNoScroll",
-
   headerDateFormat: "dddd dd.MM.yyyy",
   eventDeleteHandling: "Update",
 
