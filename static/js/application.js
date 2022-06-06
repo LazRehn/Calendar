@@ -1,21 +1,5 @@
 
 
-// To change calendar view between day and week, when button is pressed in browser
-function change_view() {
-  const view = document.getElementById("change_view").innerHTML;
-  if (view == "Päivänäkymä") {
-    nav.selectMode = "Day"
-    dp.viewType = "Day"
-    document.getElementById("change_view").innerHTML = "Viikkonäkymä";
-  } else if (view == "Viikkonäkymä") {
-    nav.selectMode = "Week"
-    dp.viewType = "WorkWeek"
-    document.getElementById("change_view").innerHTML = "Päivänäkymä"
-  };
-  nav.update();
-  dp.update();
-};
-
 // Show month calendar for selecting days/weeks
 const nav = new DayPilot.Navigator("nav", {
   showMonths: 1,
@@ -31,7 +15,7 @@ const nav = new DayPilot.Navigator("nav", {
 });
 nav.init();
 
-// Luodaan kalenteri
+// To create week calendar
 const dp = new DayPilot.Calendar("dp", {
   viewType: "WorkWeek",
   businessBeginsHour: 8,
@@ -42,11 +26,7 @@ const dp = new DayPilot.Calendar("dp", {
   headerDateFormat: "dddd dd.MM.yyyy",
   eventDeleteHandling: "Update",
 
-  // onBeforeHeaderRender: args => {
-  //   args.header.html = args.header.toString("dddd"+"<br>"+"dd.MM.yyyy");
-  // },
-
-  // Varauksen muotoilu
+  // Custom reservation box and data
   onBeforeEventRender: args => {
     args.data.html = "<b>Reg nro:</b> "
     +args.data.reg_nro+" <b>Merkki:</b> "
@@ -61,7 +41,7 @@ const dp = new DayPilot.Calendar("dp", {
     };
   },
 
-  // Poistaa tapahtuman
+  // Confirm reservation delete
   onEventDelete: function(args) {
     if (!confirm("Haluatko varmasti poistaa varauksen?")) {
       args.preventDefault();
@@ -73,9 +53,9 @@ const dp = new DayPilot.Calendar("dp", {
     id: args.e.id()
     };
     await DayPilot.Http.post('/delete_event', data);
-    // console.log("Deleted");
   },
 
+  // Confirm reservation move
   onEventMove: function (args) {
     if (!confirm("Haluatko muuttaa varauksen ajankohtaa?")) {
       args.preventDefault();
@@ -91,6 +71,7 @@ const dp = new DayPilot.Calendar("dp", {
     await DayPilot.Http.post(`/move_event`, data);
     console.log("Moved.");
   },
+
   onEventResized: async (args) => {
     const data = {
     id: args.e.id(),
@@ -100,7 +81,6 @@ const dp = new DayPilot.Calendar("dp", {
     await DayPilot.Http.post(`/move_event`, data);
     console.log("Resized.");
   },
-
 
   // To add reservation
 
@@ -148,7 +128,6 @@ const dp = new DayPilot.Calendar("dp", {
       tyomaarays: data.tyomaarays,
       invoice: data.invoice
     });
-      // console.log("Created.");
   },
 
   // Käyttäjä on valinnut tapahtuman muutettavaksi
@@ -199,6 +178,22 @@ const dp = new DayPilot.Calendar("dp", {
 dp.init();
 dp.loadEvents();
 
+// To change calendar view between day and week, when button is pressed in browser
+function change_view() {
+  const view = document.getElementById("change_view").innerHTML;
+  if (view == "Päivänäkymä") {
+    nav.selectMode = "Day"
+    dp.viewType = "Day"
+    document.getElementById("change_view").innerHTML = "Viikkonäkymä";
+  } else if (view == "Viikkonäkymä") {
+    nav.selectMode = "Week"
+    dp.viewType = "WorkWeek"
+    document.getElementById("change_view").innerHTML = "Päivänäkymä"
+  };
+  nav.update();
+  dp.update();
+};
+
 // Function to close custom contextmenu
 function hideContextMenu() {
   contextMenu.classList.remove("visible");
@@ -229,10 +224,12 @@ window.addEventListener("contextmenu", (e) => {
     })
   }
 
+  // Invoice form is shown when contextmenu button is pressed
   contextMenu.onclick = function() {
     hideContextMenu();
     invoiceModalCreate();
 
+    // If services and prices have been added already, data from server is loaded and shown
     if (e.target.offsetParent.event.data.invoice == 1) {
       const event_id = {};
       event_id.id = click_right.target.offsetParent.event.data.id;
@@ -267,7 +264,6 @@ window.addEventListener("contextmenu", (e) => {
   if (contextMenu.classList.contains("visible")) {
     hideContextMenu();
   }
-  
 });
 
 window.addEventListener("click", (clk) => {
@@ -281,6 +277,7 @@ window.addEventListener("click", (clk) => {
 
 var invoice_modal_active = false;
 
+// To send invoice data to server
 function sendData() {
   const form_data = new FormData(document.querySelector("form"));
   
@@ -289,7 +286,6 @@ function sendData() {
   for (let [key, value] of form_data) {
     service_data[key] = value;
   }
-
 
   const invoice_db = new XMLHttpRequest();
 
@@ -302,12 +298,10 @@ function sendData() {
   invoice_db.open('POST', "/add_invoice", true);
   invoice_db.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   invoice_db.send(JSON.stringify(service_data));
-
   removeInvoiceModal();
-
 };
 
-
+// Add lines to modal form, max 15
 let row_index = 0;
 function addLine() {
   if (row_index < 15) {
@@ -333,13 +327,14 @@ function addLine() {
   }
 };
 
+// To remove line(s) from invoice modal form
 function removeLine() {
   if (invoice_form.childElementCount > 2) {
     invoice_form.removeChild(invoice_form.lastChild);
   }
 };
 
-//  For creating modal
+// For creating modal dynamically
 function invoiceModalCreate () {
   row_index = 0;
   const invoice_background = document.createElement("div");

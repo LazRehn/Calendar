@@ -17,10 +17,17 @@ class FlaskTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         assert response.request.path == "/"
 
-    # Test to check that main page is not accessed if wrong username and password
+    # Test to check that main page is not accessed if wrong password is given
     def test_wrong_pw(self):
         check = app.test_client(self)
         response = check.post('/login', data=dict(username='admin', password='1111'), follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        assert not response.request.path == "/"
+
+    # Test to check that main page is not accessed if wrong username is given
+    def test_wrong_username(self):
+        check = app.test_client(self)
+        response = check.post('/login', data=dict(username='test', password='admin'), follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert not response.request.path == "/"
 
