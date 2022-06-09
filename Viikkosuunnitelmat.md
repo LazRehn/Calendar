@@ -41,4 +41,4 @@ Pyritään saamaan sovellus valmiiksi. Korjataan virheitä ja testataan.
 
 # 31.5. - 6.6.2022
 Sovelluksen testaus manuaalisesti Test case -listan avulla sekä testauksen automatisointi. Parannellaan kirjautumistoimintoa. Luodaan Logout-mahdollisuus. Varmistuskysely ennen siirtoa ja poistoa.
-Arviointilomakkeet pitää myös täyttää!!!
+Arviointilomakkeet pitää myös täyttää!
